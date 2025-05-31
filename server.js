@@ -1,12 +1,11 @@
 require('dotenv').config();
-require('./routes/oauth');
+require('./routes/oauth.routes');
 
 const express = require('express');
 const session = require('express-session');
 const passport = require('passport');
 
-const authRoutes = require('./routes/auth');
-const otpRoutes = require('./routes/otp');
+const routes = require('./routes');
 
 const app = express();
 
@@ -15,8 +14,6 @@ app.use(express.json());
 app.use(session({ secret: 'cats' }));
 app.use(passport.initialize());
 app.use(passport.session());
-
-app.use('/otp', otpRoutes); 
 
 function isLoggedIn(req, res, next) {
   req.user ? next() : res.sendStatus(401);
@@ -49,6 +46,6 @@ app.get('/auth/google', (req, res) => {
   res.send('Login with Google');
 });
 
-app.use('/auth', authRoutes);
+app.use('/api', routes);
 
 app.listen(3000, () => console.log('Server running on http://localhost:3000'));

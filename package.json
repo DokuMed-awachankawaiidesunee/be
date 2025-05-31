@@ -19,7 +19,9 @@
   "homepage": "https://github.com/DokuMed-awachankawaiidesunee/be#readme",
   "description": "",
   "dependencies": {
+    "@google/genai": "^1.2.0",
     "bcrypt": "^6.0.0",
+    "be": "file:",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "express-session": "^1.18.1",
@@ -27,6 +29,7 @@
     "passport": "^0.7.0",
     "passport-google-oauth2": "^0.2.0",
     "passport-google-oauth20": "^2.0.0",
+    "pg": "^8.16.0",
     "twilio": "^5.7.0"
   },
   "devDependencies": {
