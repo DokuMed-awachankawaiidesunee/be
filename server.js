@@ -4,28 +4,57 @@ require('./routes/oauth');
 const express = require('express');
 const session = require('express-session');
 const passport = require('passport');
+const cors = require('cors');
 
 const authRoutes = require('./routes/auth');
 const otpRoutes = require('./routes/otp');
 
 const app = express();
+const PORT = process.env.PORT || 3000;
 
+app.use(cors({
+  origin: [
+    'http://localhost:5173',     
+    'http://localhost:8081',     
+    'exp://192.168.2.88:8081'  
+  ],
+  credentials: true
+}));
+
+// Middleware
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.use(session({ secret: 'cats' }));
+// Session configuration
+app.use(session({ 
+  secret: process.env.SESSION_SECRET || 'cats', 
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }
+}));
+
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use('/otp', otpRoutes); 
+// Route middleware
+app.use('/otp', otpRoutes);
+app.use('/auth', authRoutes);
 
+// Authentication middleware
 function isLoggedIn(req, res, next) {
   req.user ? next() : res.sendStatus(401);
 }
 
+// Routes
 app.get('/', (req, res) => {
   res.send('<a href="/auth/google">Login with Google</a>');
 });
 
+// Google OAuth routes
 app.get('/auth/google',
   passport.authenticate('google', { scope: ['profile', 'email'] })
 );
@@ -45,10 +74,10 @@ app.get('/protected', isLoggedIn, (req, res) => {
   res.send('This is a protected route');
 });
 
-app.get('/auth/google', (req, res) => {
-  res.send('Login with Google');
+// API test endpoint
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'Backend is connected!' });
 });
 
-app.use('/auth', authRoutes);
-
-app.listen(3000, () => console.log('Server running on http://localhost:3000'));
+// Start server
+app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
