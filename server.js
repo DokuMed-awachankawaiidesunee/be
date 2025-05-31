@@ -1,6 +1,8 @@
 require('dotenv').config();
 require('./routes/oauth.routes');
 
+const otpRoutes = require("./otp.routes");
+
 const express = require('express');
 const session = require('express-session');
 const passport = require('passport');
