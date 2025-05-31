@@ -1,13 +1,12 @@
 require('dotenv').config();
-require('./routes/oauth');
+require('./routes/oauth.routes');
 
 const express = require('express');
 const session = require('express-session');
 const passport = require('passport');
 const cors = require('cors');
 
-const authRoutes = require('./routes/auth');
-const otpRoutes = require('./routes/otp');
+const routes = require('./routes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -79,5 +78,6 @@ app.get('/api/test', (req, res) => {
   res.json({ message: 'Backend is connected!' });
 });
 
-// Start server
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+app.use('/api', routes);
+
+app.listen(3000, () => console.log('Server running on http://localhost:3000'));

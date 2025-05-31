@@ -1,12 +1,12 @@
+const express = require('express');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth2').Strategy;
 
-const GOOGLE_CLIENT_ID = '883332274526-gnrt0r5fuqu3b6ls8uthiglqealfdgvr.apps.googleusercontent.com';
-const GOOGLE_CLIENT_SECRET = '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';
+const router = express.Router();
 
 passport.use(new GoogleStrategy({
-    clientID:     GOOGLE_CLIENT_ID,
-    clientSecret: GOOGLE_CLIENT_SECRET,
+    clientID:     process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: "http://localhost:3000/google/callback",
     passReqToCallback   : true
   },
@@ -22,3 +22,5 @@ passport.serializeUser(function(user, done) {
 passport.deserializeUser(function(user, done) {
     done(null, user);
 });
+
+module.exports = router
