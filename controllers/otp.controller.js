@@ -1,25 +1,43 @@
-const { sendOtp, verifyOtp } = require('../utils/twilio');
+const { sendOtp } = require('../utils/twilio');
 
-exports.sendOtpWhatsApp = async (req, res) => {
-  const { phone } = req.body;
+const otpStore = {};
+
+const sendOtpHandler = async (req, res) => {
+  const { phoneNumber } = req.body;
+  console.log("Received phone number:", phoneNumber);
+
+  if (!phoneNumber) {
+    return res.status(400).json({ error: 'phoneNumber is required' });
+  }
+
+  const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+
   try {
-    await sendOtp(phone);
+    await sendOtp(phoneNumber, otpCode);
     res.json({ message: 'OTP sent via WhatsApp' });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error(error);
+    res.status(500).json({ error: 'Failed to send OTP' });
   }
 };
 
-exports.verifyOtpWhatsApp = async (req, res) => {
-  const { phone, code } = req.body;
+
+
+const verifyOtpWhatsApp = async (req, res) => {
+  const { phoneNumber, code } = req.body;
   try {
-    const verification = await verifyOtp(phone, code);
-    if (verification.status === 'approved') {
-      res.json({ message: 'OTP verified successfully' });
-    } else {
-      res.status(400).json({ message: 'Invalid or expired OTP' });
-    }
+    const storedOtp = otpStore[phoneNumber];
+    if (!storedOtp) return res.status(400).json({ message: 'OTP not found or expired' });
+    if (storedOtp !== code) return res.status(400).json({ message: 'Invalid OTP code' });
+
+    delete otpStore[phoneNumber];
+    res.json({ message: 'OTP verified successfully' });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Verification failed' });
   }
+};
+
+module.exports = {
+  sendOtpHandler,
+  verifyOtpWhatsApp,
 };

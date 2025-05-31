@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const otpController = require('../controllers/otp.controller');
 
-router.post('/send-otp', otpController.sendOtpWhatsApp);
-router.post('/verify-otp', otpController.verifyOtpWhatsApp);
+const { sendOtpHandler, verifyOtpWhatsApp } = require('../controllers/otp.controller');
+
+router.post('/send', sendOtpHandler);
+router.post('/verify', verifyOtpWhatsApp);
 
 module.exports = router;
