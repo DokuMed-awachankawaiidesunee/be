@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
-const authRoutes = require("./auth.routes");
-const oauthRoutes = require("./oauth.routes");
-const otpRoutes = require("./otp.routes");
+const authRoutes = require("./auth.routes.js");
+const oauthRoutes = require("./oauth.routes.js");
+const otpRoutes = require("./otp.routes.js");
 
 router.use("/auth", authRoutes);
 router.use("/otp", otpRoutes);
