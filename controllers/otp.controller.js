@@ -14,6 +14,11 @@ const sendOtpHandler = async (req, res) => {
 
   try {
     await sendOtp(phoneNumber, otpCode);
+    
+    otpStore[phoneNumber] = otpCode;
+
+    console.log('[SEND] otpStore:', otpStore);
+
     res.json({ message: 'OTP sent via WhatsApp' });
   } catch (error) {
     console.error(error);
@@ -24,18 +29,26 @@ const sendOtpHandler = async (req, res) => {
 
 
 const verifyOtpWhatsApp = async (req, res) => {
-  const { phoneNumber, code } = req.body;
-  try {
-    const storedOtp = otpStore[phoneNumber];
-    if (!storedOtp) return res.status(400).json({ message: 'OTP not found or expired' });
-    if (storedOtp !== code) return res.status(400).json({ message: 'Invalid OTP code' });
+  let { phoneNumber, code } = req.body;
 
-    delete otpStore[phoneNumber];
-    res.json({ message: 'OTP verified successfully' });
-  } catch (error) {
-    res.status(500).json({ error: 'Verification failed' });
+  if (!phoneNumber || !code) {
+    return res.status(400).json({ message: 'phoneNumber and code are required' });
   }
+
+  // Normalisasi: pastikan + di depan
+  phoneNumber = phoneNumber.trim();
+  if (!phoneNumber.startsWith('+')) {
+    phoneNumber = '+' + phoneNumber;
+  }
+
+  const storedOtp = otpStore[phoneNumber];
+  if (!storedOtp) return res.status(400).json({ message: 'OTP not found or expired' });
+  if (storedOtp !== code.toString().trim()) return res.status(400).json({ message: 'Invalid OTP code' });
+
+  delete otpStore[phoneNumber];
+  res.json({ message: 'OTP verified successfully' });
 };
+
 
 module.exports = {
   sendOtpHandler,
